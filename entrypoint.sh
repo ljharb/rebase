@@ -67,7 +67,12 @@ git fetch origin $HEAD_BRANCH
 
 # do the rebase
 git checkout -b $HEAD_BRANCH origin/$HEAD_BRANCH
+MERGE_COUNT=$(git log --oneline $BASE_BRANCH..$HEAD_BRANCH --merges | wc -l | tr -d '[:space:]')
+if [ $MERGE_COUNT -eq 0 ]; then
+	echo "No merge commits found, yay!"
+	exit 78
+fi
 git rebase origin/$BASE_BRANCH
 
 # push back
-git push --force
+git push origin HEAD:$HEAD_BRANCH --force
