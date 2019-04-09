@@ -72,7 +72,7 @@ if [ $MERGE_COUNT -eq 0 ]; then
 	echo "No merge commits found, yay!"
 	exit 78
 fi
-git rebase origin/$BASE_BRANCH
+git rebase origin/$BASE_BRANCH --committer-date-is-author-date
 
 # push back
 git push origin HEAD:$HEAD_BRANCH --force
