@@ -47,13 +47,26 @@ fi
 
 HEAD_REPO=$(echo "$pr_resp" | jq -r .head.repo.full_name)
 HEAD_BRANCH=$(echo "$pr_resp" | jq -r .head.ref)
+REBASEABLE=$(echo "$pr_resp" | jq -r .rebaseable)
+CAN_MODIFY=$(echo "$pr_resp" | jq -r .maintainer_can_modify)
+
+if [ $REBASEABLE != true ]; then
+	echo "Branch is not rebaseable"
+	exit 1
+fi
+if [ $CAN_MODIFY != true ]; then
+	echo "PR does not allow edits"
+	exit 1
+fi
 
 echo "Base branch for PR #$PR_NUMBER is $BASE_BRANCH"
 
-if [[ "$BASE_REPO" != "$HEAD_REPO" ]]; then
-	echo "PRs from forks are not supported at the moment."
-	exit 1
-fi
+git remote add --no-tags pr_source git@github.com:${HEAD_REPO}.git
+
+#if [[ "$BASE_REPO" != "$HEAD_REPO" ]]; then
+#	echo "PRs from forks are not supported at the moment."
+#	exit 1
+#fi
 
 git remote set-url origin https://x-access-token:$GITHUB_TOKEN@github.com/$REPO_FULLNAME.git
 git config --global user.email "action@github.com"
@@ -63,10 +76,10 @@ set -o xtrace
 
 # make sure branches are up-to-date
 git fetch origin $BASE_BRANCH
-git fetch origin $HEAD_BRANCH
+git fetch pr_source $HEAD_BRANCH
 
 # do the rebase
-git checkout -b $HEAD_BRANCH origin/$HEAD_BRANCH
+git checkout -b $HEAD_BRANCH pr_source/$HEAD_BRANCH
 MERGE_COUNT=$(git log --oneline $BASE_BRANCH..$HEAD_BRANCH --merges | wc -l | tr -d '[:space:]')
 if [ $MERGE_COUNT -eq 0 ]; then
 	echo "No merge commits found, yay!"
@@ -75,4 +88,4 @@ fi
 git rebase origin/$BASE_BRANCH --committer-date-is-author-date
 
 # push back
-git push origin HEAD:$HEAD_BRANCH --force
+git push pr_source HEAD:$HEAD_BRANCH --force
