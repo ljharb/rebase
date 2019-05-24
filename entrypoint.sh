@@ -94,7 +94,7 @@ else
 fi
 
 # push back
-git push pr_source HEAD:$HEAD_BRANCH --force
+git push pr_source HEAD:$HEAD_BRANCH --force-with-lease
 
 >&2 echo "${MERGE_COUNT} merge commit(s) found; PR branch rebased."
 exit 1
