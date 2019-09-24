@@ -25,8 +25,7 @@ if [[ "$(jq -r ".action" "$GITHUB_EVENT_PATH")" != "created" ]]; then
 fi
 
 PR_NUMBER=$(jq -r ".number" "$GITHUB_EVENT_PATH")
-REPO_FULLNAME=$(jq -r ".repository.full_name" "$GITHUB_EVENT_PATH")
-echo "Collecting information about PR #$PR_NUMBER of $REPO_FULLNAME..."
+echo "Collecting information about PR #$PR_NUMBER of $GITHUB_REPOSITORY..."
 
 if [ -z "$GITHUB_TOKEN" ]; then
 	echo "Set the GITHUB_TOKEN env variable."
@@ -38,7 +37,7 @@ API_HEADER="Accept: application/vnd.github.v3+json"
 AUTH_HEADER="Authorization: token $GITHUB_TOKEN"
 
 pr_resp=$(curl -X GET -s -H "${AUTH_HEADER}" -H "${API_HEADER}" \
-          "${URI}/repos/$REPO_FULLNAME/pulls/$PR_NUMBER")
+          "${URI}/repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER")
 
 BASE_REPO=$(echo "$pr_resp" | jq -r .base.repo.full_name)
 BASE_BRANCH=$(echo "$pr_resp" | jq -r .base.ref)
@@ -78,7 +77,7 @@ git config --global --add safe.directory /github/workspace
 
 git remote add --no-tags pr_source https://x-access-token:$GITHUB_TOKEN@github.com/${HEAD_REPO}.git
 
-git remote set-url origin https://x-access-token:$GITHUB_TOKEN@github.com/$REPO_FULLNAME.git
+git remote set-url origin https://x-access-token:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git.git
 git config --global user.email 'action@github.com'
 git config --global user.name 'GitHub Action'
 
@@ -103,7 +102,7 @@ if [ $MERGE_COUNT -eq 0 ]; then
 	echo 'No merge commits found, yay!'
 	exit 0
 fi
-if [ "$REPO_FULLNAME" = 'tc39/ecma262' ]; then
+if [ "$GITHUB_REPOSITORY" = 'tc39/ecma262' ]; then
 	git rebase -f origin/$BASE_BRANCH
 else
 	git rebase origin/$BASE_BRANCH --committer-date-is-author-date
