@@ -1,0 +1,6 @@
+name: 'Automatic Rebase'
+description: 'Automatically rebase a PR when a merge commit appears'
+author: 'Jordan Harband'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
