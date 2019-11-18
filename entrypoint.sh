@@ -79,7 +79,11 @@ if [ $MERGE_COUNT -eq 0 ]; then
 	echo 'No merge commits found, yay!'
 	exit 0
 fi
-git rebase origin/$BASE_BRANCH --committer-date-is-author-date
+if [ "$REPO_FULLNAME" = 'tc39/ecma262' ]; then
+	git rebase -f origin/$BASE_BRANCH
+else
+	git rebase origin/$BASE_BRANCH --committer-date-is-author-date
+fi
 
 # push back
 git push pr_source HEAD:$HEAD_BRANCH --force
