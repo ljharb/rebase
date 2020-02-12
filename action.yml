@@ -2,5 +2,8 @@ name: 'Automatic Rebase'
 description: 'Automatically rebase a PR when a merge commit appears'
 author: 'Jordan Harband'
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
+  using: 'composite'
+  steps:
+    - name: Rebase PR
+      shell: bash
+      run: ${{ github.action_path }}/entrypoint.sh
