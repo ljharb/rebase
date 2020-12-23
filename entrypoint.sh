@@ -68,6 +68,10 @@ set -o xtrace
 git fetch origin $BASE_BRANCH
 git fetch pr_source $HEAD_BRANCH
 
+# ensure that if the head branch and base branch have the same name, nothing breaks
+git checkout origin/$BASE_BRANCH
+git branch -D $HEAD_BRANCH || echo "$HEAD_BRANCH did not exist already"
+
 # do the rebase
 git checkout -b $HEAD_BRANCH pr_source/$HEAD_BRANCH
 MERGE_COUNT=$(git log --oneline origin/$BASE_BRANCH..pr_source/$HEAD_BRANCH --merges | wc -l | tr -d '[:space:]')
