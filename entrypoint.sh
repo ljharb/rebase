@@ -3,7 +3,7 @@
 set -e
 
 # skip if not a PR
-echo "Checking if a PR command..."
+echo "Checking if a PR..."
 (jq -r ".pull_request._links.html.href" "$GITHUB_EVENT_PATH") || exit 78
 
 # jq . $GITHUB_EVENT_PATH
@@ -55,6 +55,9 @@ if [ $CAN_MODIFY != true ] && [ $IS_FORK = true ]; then
 fi
 
 echo "Base branch for PR #${PR_NUMBER} is ${BASE_BRANCH}"
+
+# avoids weird `fatal: unsafe repository ('/github/workspace' is owned by someone else)` error
+git config --global --add safe.directory /github/workspace
 
 git remote add --no-tags pr_source https://x-access-token:$GITHUB_TOKEN@github.com/${HEAD_REPO}.git
 
