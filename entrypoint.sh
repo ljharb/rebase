@@ -3,7 +3,7 @@
 set -e
 
 # See: https://developer.github.com/actions/creating-github-actions/accessing-the-runtime-environment/#exit-codes-and-statuses
-NEUTRAL_EXIT_CODE=78
+NEUTRAL_EXIT_CODE=0
 
 # skip if not a PR
 echo "Checking if a PR..."
