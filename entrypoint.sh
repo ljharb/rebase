@@ -57,6 +57,7 @@ fi
 echo "Base branch for PR #${PR_NUMBER} is ${BASE_BRANCH}"
 
 # avoids weird `fatal: unsafe repository ('/github/workspace' is owned by someone else)` error
+# See https://github.com/actions/checkout/issues/766 for motivation.
 git config --global --add safe.directory /github/workspace
 
 git remote add --no-tags pr_source https://x-access-token:$GITHUB_TOKEN@github.com/${HEAD_REPO}.git
